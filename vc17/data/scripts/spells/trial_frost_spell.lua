@@ -11,6 +11,22 @@ end
 
 combat:setCallback(CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
 
-function onCastSpell(creature, variant)
+local spell = Spell(SPELL_INSTANT)
+
+function spell.onCastSpell(creature, variant)
+	print("this is a test")
 	return combat:execute(creature, variant)
 end
+
+spell:name("Trial Frost Spell")
+spell:words("frigo")
+spell:id(221)
+spell:level(1)
+spell:mana(0)
+spell:group("attack")
+spell:isAggressive(true)
+spell:cooldown(0)
+spell:groupCooldown(0)
+spell:needLearn(false)
+spell:vocation("sorcerer", "master sorcerer")
+spell:register()

@@ -1,26 +1,33 @@
-local combat = Combat()
-combat:setParameter(COMBAT_PARAM_TYPE, COMBAT_ICEDAMAGE)
-combat:setParameter(COMBAT_PARAM_EFFECT, CONST_ME_ICETORNADO)
-combat:setArea(createCombatArea(AREA_CIRCLE3X3))
+local SPELL_REPEAT_COUNT = 4
 
-function onGetFormulaValues(player, level, magicLevel)
-	local min = (level / 5) + (magicLevel * 3) + 32
-	local max = (level / 5) + (magicLevel * 9) + 40
-	return -min, -max
+function spellCallback(cid, position, count)
+	--66.66% chance to spawn effect on tile
+	if math.random(0,2) < 2 then
+		doAreaCombat(cid, COMBAT_ICEDAMAGE, position, 0, -100, -100, CONST_ME_ICETORNADO)
+	end
+
+	--wait to repeat effect
+	if count <= SPELL_REPEAT_COUNT then
+		addEvent(spellCallback, math.random(500, 750), cid, position, count + 1)
+	end
 end
 
-combat:setCallback(CALLBACK_PARAM_LEVELMAGICVALUE, "onGetFormulaValues")
+function onTargetTile(creature, position)
+	spellCallback(creature:getId(), position, 0)
+end
+
+local combat = Combat()
+combat:setArea(createCombatArea(AREA_CIRCLE3X3))
+combat:setCallback(CALLBACK_PARAM_TARGETTILE, "onTargetTile")
 
 local spell = Spell(SPELL_INSTANT)
 
 function spell.onCastSpell(creature, variant)
-	print("this is a test")
 	return combat:execute(creature, variant)
 end
 
 spell:name("Trial Frost Spell")
 spell:words("frigo")
-spell:id(221)
 spell:level(1)
 spell:mana(0)
 spell:group("attack")
